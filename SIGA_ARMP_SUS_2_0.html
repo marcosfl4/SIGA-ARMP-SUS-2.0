@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGA-ARMP SUS 2.0 | Gestão Logística</title>
+<style>
+:root{--primary:#0056b3;--primary-dark:#003d82;--primary-light:#e8f1fb;--bg-body:#f4f7fa;--bg-card:#fff;--text-main:#1e293b;--text-muted:#64748b;--border:#e2e8f0;--green:#15803d;--green-bg:#dcfce7;--yellow:#b45309;--yellow-bg:#fef3c7;--red:#b91c1c;--red-bg:#fee2e2;--purple:#6d28d9;--purple-bg:#ede9fe;--radius:10px;--shadow:0 2px 8px rgba(15,23,42,.06)}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg-body);color:var(--text-main);line-height:1.5}
+.topbar{background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:#fff;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;box-shadow:0 2px 10px #0002}.brand{display:flex;align-items:center;gap:.85rem}.logo-icon{background:#fff;color:var(--primary);font-weight:900;font-size:1.4rem;width:42px;height:42px;border-radius:8px;display:grid;place-items:center}.brand h1{font-size:1.35rem;letter-spacing:-.02em}.brand h1 span{background:#ffffff33;padding:.1rem .45rem;border-radius:4px;font-size:.85rem}.brand p{font-size:.82rem;opacity:.9}.header-controls{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}.filter-group{display:flex;align-items:center;gap:.5rem;background:#ffffff24;padding:.45rem .85rem;border-radius:8px}.filter-group label{font-size:.85rem;font-weight:600}.filter-group select{padding:.35rem .6rem;border-radius:6px;border:0;font-weight:600;color:var(--text-main)}
+.container{max-width:1500px;margin:1.5rem auto;padding:0 1.5rem;display:flex;flex-direction:column;gap:1.5rem}.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}.kpi-card{background:#fff;padding:1.15rem;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);border-left:4px solid var(--primary)}.kpi-card.border-red{border-left-color:var(--red)}.kpi-card.border-yellow{border-left-color:var(--yellow)}.kpi-card.border-purple{border-left-color:var(--purple)}.kpi-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.45rem}.kpi-title{font-size:.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase}.kpi-icon{width:32px;height:32px;border-radius:8px;display:grid;place-items:center}.kpi-icon.blue{background:var(--primary-light)}.kpi-icon.red{background:var(--red-bg)}.kpi-icon.yellow{background:var(--yellow-bg)}.kpi-icon.purple{background:var(--purple-bg)}.kpi-value{font-size:1.8rem;font-weight:800}.text-red{color:var(--red)}.text-yellow{color:var(--yellow)}.text-purple{color:var(--purple)}.kpi-sub{font-size:.78rem;color:var(--text-muted);margin-top:.2rem}
+.panel{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);padding:1.3rem;min-width:0}.panel-header{margin-bottom:1rem}.panel-header.space-between{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}.panel-header h2{font-size:1.08rem}.panel-header p{font-size:.84rem;color:var(--text-muted)}.transfer-panel{border-top:3px solid var(--purple)}.suggestions-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem}.suggestion-card{background:#faf8ff;border:1px solid #ddd6fe;border-radius:8px;padding:1rem;display:flex;flex-direction:column;gap:.7rem}.suggestion-badge{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;padding:.2rem .55rem;border-radius:4px;background:var(--purple-bg);color:var(--purple);margin-bottom:.35rem}.suggestion-card p{font-size:.87rem}.empty-state{color:var(--text-muted);font-size:.9rem;padding:.5rem 0}.workspace-grid{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:1.5rem;align-items:start}@media(max-width:1100px){.workspace-grid{grid-template-columns:1fr}}.search-box input{padding:.5rem .8rem;border:1px solid var(--border);border-radius:6px;font-size:.88rem;width:260px;max-width:100%}.table-responsive{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:.84rem}th{background:#f8fafc;color:var(--text-muted);font-weight:700;text-align:left;padding:.7rem;border-bottom:2px solid var(--border);white-space:nowrap}td{padding:.75rem .7rem;border-bottom:1px solid var(--border);vertical-align:middle}tbody tr:hover{background:#f8fafc}.badge{display:inline-flex;align-items:center;padding:.22rem .55rem;border-radius:999px;font-size:.73rem;font-weight:700;white-space:nowrap}.badge-green{background:var(--green-bg);color:var(--green)}.badge-yellow{background:var(--yellow-bg);color:var(--yellow)}.badge-red{background:var(--red-bg);color:var(--red)}.badge-purple{background:var(--purple-bg);color:var(--purple)}.abc-tag{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:6px;font-weight:800;font-size:.78rem}.abc-A{background:#dbeafe;color:#1e40af}.abc-B{background:#f1f5f9;color:#334155}.abc-C{background:#f8fafc;color:#64748b;border:1px solid #cbd5e1}.ven{font-size:.72rem;font-weight:800;border:1px solid var(--border);border-radius:5px;padding:.16rem .35rem}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:.3rem;background:#f1f5f9;padding:.3rem;border-radius:8px;margin-bottom:1rem}.tab-btn{border:0;background:transparent;padding:.5rem .25rem;font-size:.78rem;font-weight:700;color:var(--text-muted);border-radius:6px;cursor:pointer}.tab-btn.active{background:#fff;color:var(--primary);box-shadow:0 1px 3px #0002}.mov-form{display:none;flex-direction:column;gap:.8rem}.mov-form.active{display:flex}.form-group{display:flex;flex-direction:column;gap:.25rem;min-width:0}.form-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem}.form-group label{font-size:.8rem;font-weight:650}.form-group input,.form-group select{width:100%;min-width:0;padding:.52rem .65rem;border:1px solid #cbd5e1;border-radius:6px;font-size:.86rem;background:#fff;color:var(--text-main)}.form-group input:focus,.form-group select:focus{outline:2px solid var(--primary-light);border-color:var(--primary)}.hint{font-size:.73rem;color:var(--text-muted)}.btn{padding:.58rem .9rem;border-radius:6px;font-size:.84rem;font-weight:650;border:0;cursor:pointer;transition:opacity .2s,transform .1s}.btn:hover{opacity:.92}.btn:active{transform:scale(.99)}.btn-block{width:100%}.btn-primary{background:var(--primary);color:#fff}.btn-success{background:var(--green);color:#fff}.btn-purple{background:var(--purple);color:#fff}.btn-sm{padding:.38rem .7rem;font-size:.77rem}.btn-outline-danger{background:#ffffff1f;color:#fff;border:1px solid #ffffff80}.btn-outline-danger:hover{background:var(--red)}.audit-box{margin-top:1.4rem;padding-top:1rem;border-top:1px solid var(--border)}.audit-box h3{font-size:.82rem;text-transform:uppercase;color:var(--text-muted);margin-bottom:.6rem}#auditLog{list-style:none;display:flex;flex-direction:column;gap:.45rem;max-height:190px;overflow-y:auto;font-size:.76rem}#auditLog li{background:#f8fafc;padding:.48rem .6rem;border-radius:6px;border-left:3px solid var(--primary)}.toast{position:fixed;bottom:1.5rem;right:1.5rem;max-width:min(420px,calc(100vw - 2rem));background:#1e293b;color:#fff;padding:.8rem 1.1rem;border-radius:8px;font-size:.86rem;box-shadow:0 10px 25px #0003;opacity:0;pointer-events:none;transform:translateY(15px);transition:all .3s;z-index:99}.toast.show{opacity:1;transform:translateY(0)}.notice{padding:.75rem .9rem;border-radius:8px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:.8rem}.section-title{font-size:1rem;margin-bottom:.75rem}.mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.8rem}.mini-stat{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:.8rem}.mini-stat strong{display:block;font-size:1.1rem}.mini-stat span{font-size:.75rem;color:var(--text-muted)}.hidden{display:none!important}footer{color:var(--text-muted);font-size:.76rem;text-align:center;padding:0 1rem 1.5rem}.danger-text{color:var(--red);font-weight:700}
+@media(max-width:650px){.topbar{padding:1rem}.container{padding:0 .8rem;margin:1rem auto}.header-controls,.filter-group{width:100%}.filter-group{justify-content:space-between}.filter-group select{max-width:65%}.suggestions-grid{grid-template-columns:1fr}.panel{padding:1rem}.form-row{grid-template-columns:1fr}.search-box,.search-box input{width:100%}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><div class="logo-icon">✚</div><div><h1>SIGA-ARMP <span>SUS 2.0</span></h1><p>Inteligência Logística, Ressuprimento e Controle FEFO em UBS</p></div></div>
+  <div class="header-controls">
+    <div class="filter-group"><label for="ubsFilter">Unidade de Saúde:</label><select id="ubsFilter"><option value="TODAS">Todas as UBS (Rede Municipal)</option></select></div>
+    <button id="btnReset" class="btn btn-outline-danger" title="Restaurar cenário inicial">↺ Resetar Dados de Teste</button>
+  </div>
+</header>
+<main class="container">
+  <section class="notice"> <strong>Ambiente demonstrativo acadêmico:</strong> dados fictícios armazenados neste navegador. A integração em tempo real entre UBS exige servidor e banco de dados centralizados.</section>
+  <section class="kpi-grid" aria-label="Indicadores principais">
+    <div class="kpi-card"><div class="kpi-header"><span class="kpi-title">Lotes monitorados</span><span class="kpi-icon blue">📦</span></div><div class="kpi-value" id="kpiTotalItems">0</div><div class="kpi-sub" id="kpiTotalLotes">0 ativos</div></div>
+    <div class="kpi-card border-red"><div class="kpi-header"><span class="kpi-title">Itens no ponto de pedido</span><span class="kpi-icon red">🚨</span></div><div class="kpi-value text-red" id="kpiCritical">0</div><div class="kpi-sub">Estoque total por UBS ≤ PP</div></div>
+    <div class="kpi-card border-yellow"><div class="kpi-header"><span class="kpi-title">Lotes a vencer em 60 dias</span><span class="kpi-icon yellow">⏳</span></div><div class="kpi-value text-yellow" id="kpiExpiring">0</div><div class="kpi-sub">Lotes válidos com prazo curto</div></div>
+    <div class="kpi-card border-purple"><div class="kpi-header"><span class="kpi-title">Remanejamentos possíveis</span><span class="kpi-icon purple">⇄</span></div><div class="kpi-value text-purple" id="kpiTransfers">0</div><div class="kpi-sub">Sugestões sem comprometer o PP do doador</div></div>
+  </section>
+  <section class="panel transfer-panel">
+    <div class="panel-header"><h2>⇄ Inteligência de Remanejamento (Efeito Gangorra)</h2><p>Compara saldo agregado por medicamento em cada UBS, preservando o estoque de segurança da unidade doadora.</p></div>
+    <div id="transferSuggestionsList" class="suggestions-grid"></div>
+  </section>
+  <section class="panel">
+    <div class="panel-header"><h2>📊 Planejamento e cobertura do estoque</h2><p>Indicadores calculados por medicamento e UBS; unidades de medida diferentes não são somadas.</p></div>
+    <div id="planningSummary" class="mini-grid"></div>
+  </section>
+  <div class="workspace-grid">
+    <section class="panel table-panel">
+      <div class="panel-header space-between"><div><h2>📋 Posição de Estoque (Ordenada por FEFO)</h2><p>Validade real do lote; lotes vencidos ficam bloqueados para dispensação e remanejamento.</p></div><div class="search-box"><input type="search" id="searchInput" placeholder="Buscar medicamento, lote ou UBS..."></div></div>
+      <div class="table-responsive"><table><thead><tr><th>UBS</th><th>Medicamento / Insumo</th><th>Lote</th><th>Validade</th><th>Saldo</th><th>Saldo / PP</th><th>ABC / VEN</th><th>Status</th></tr></thead><tbody id="inventoryBody"></tbody></table></div>
+      <p class="hint" style="margin-top:.65rem">ABC: classificação demonstrativa por valor de consumo (CMM × custo unitário), recalculada na rede. VEN: criticidade cadastrada (Vital, Essencial ou Não essencial).</p>
+    </section>
+    <aside class="panel action-panel">
+      <div class="panel-header"><h2>⚡ Movimentação Rápida</h2><p>Registre dispensações, entradas e transferências entre UBS.</p></div>
+      <div class="tabs"><button type="button" class="tab-btn active" data-tab="saida">Saída</button><button type="button" class="tab-btn" data-tab="entrada">Entrada</button><button type="button" class="tab-btn" data-tab="transferencia">Transferência</button></div>
+      <form id="formSaida" class="mov-form active">
+        <div class="form-group"><label for="saidaUbs">UBS de Origem</label><select id="saidaUbs" required></select></div>
+        <div class="form-group"><label for="saidaItem">Medicamento / Insumo</label><select id="saidaItem" required></select><small class="hint">Baixa automática dos lotes válidos com vencimento mais próximo (FEFO).</small></div>
+        <div class="form-group"><label for="saidaQtd">Quantidade dispensada</label><input type="number" id="saidaQtd" min="1" step="1" required></div>
+        <button type="submit" class="btn btn-primary btn-block">Confirmar Dispensação</button>
+      </form>
+      <form id="formEntrada" class="mov-form">
+        <div class="form-group"><label for="entradaUbs">UBS de Destino</label><select id="entradaUbs" required></select></div>
+        <div class="form-group"><label for="entradaNome">Medicamento / Insumo</label><input id="entradaNome" list="listaMedicamentos" required placeholder="Ex.: Losartana 50mg"><datalist id="listaMedicamentos"></datalist></div>
+        <div class="form-row"><div class="form-group"><label for="entradaLote">Código do lote</label><input id="entradaLote" required></div><div class="form-group"><label for="entradaValidade">Data de validade</label><input type="date" id="entradaValidade" required></div></div>
+        <div class="form-row"><div class="form-group"><label for="entradaQtd">Quantidade</label><input type="number" id="entradaQtd" min="1" step="1" required></div><div class="form-group"><label for="entradaUnidade">Unidade</label><select id="entradaUnidade"><option>comp.</option><option>un.</option><option>pct</option><option>frasco</option><option>ampola</option><option>tubo</option></select></div></div>
+        <div class="form-row"><div class="form-group"><label for="entradaCmm">CMM mensal</label><input type="number" id="entradaCmm" min="0" step="0.01" value="600" required></div><div class="form-group"><label for="entradaLead">Lead time (dias)</label><input type="number" id="entradaLead" min="0" step="1" value="7" required></div></div>
+        <div class="form-row"><div class="form-group"><label for="entradaES">Estoque segurança (%)</label><input type="number" id="entradaES" min="0" max="300" step="1" value="20" required></div><div class="form-group"><label for="entradaCusto">Custo unitário (R$)</label><input type="number" id="entradaCusto" min="0" step="0.01" value="0" required></div></div>
+        <div class="form-row"><div class="form-group"><label for="entradaVen">Criticidade VEN</label><select id="entradaVen"><option value="V">Vital</option><option value="E" selected>Essencial</option><option value="N">Não essencial</option></select></div><div class="form-group"><label for="entradaAbc">Classe ABC (referência)</label><select id="entradaAbc"><option value="AUTO">Automática</option><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></div></div>
+        <small class="hint">PP = (CMM ÷ 30 × lead time) + estoque de segurança. ES é um parâmetro configurável.</small>
+        <button type="submit" class="btn btn-success btn-block">Registrar Entrada no Estoque</button>
+      </form>
+      <form id="formTransferencia" class="mov-form">
+        <div class="form-group"><label for="transfOrigem">UBS Cedente</label><select id="transfOrigem"></select></div>
+        <div class="form-group"><label for="transfItem">Lote disponível na origem</label><select id="transfItem" required></select></div>
+        <div class="form-group"><label for="transfDestino">UBS Solicitante</label><select id="transfDestino"></select></div>
+        <div class="form-group"><label for="transfQtd">Quantidade a transferir</label><input type="number" id="transfQtd" min="1" step="1" required></div>
+        <small class="hint">A transferência mantém o lote e sua validade original. O saldo do doador não pode ficar abaixo do PP, salvo operação manual de contingência não habilitada nesta versão.</small>
+        <button type="submit" class="btn btn-purple btn-block">Executar Remanejamento</button>
+      </form>
+      <div class="audit-box"><h3>Histórico de Movimentações</h3><ul id="auditLog"></ul></div>
+    </aside>
+  </div>
+  <section class="panel">
+    <div class="panel-header"><h2>📑 Relatório de perdas e auditoria</h2><p>Registre perdas para rastreabilidade e acompanhamento gerencial.</p></div>
+    <form id="formPerda" class="form-row" style="align-items:end">
+      <div class="form-group"><label for="perdaLote">Lote</label><select id="perdaLote" required></select></div>
+      <div class="form-group"><label for="perdaQtd">Quantidade perdida</label><input type="number" id="perdaQtd" min="1" step="1" required></div>
+      <div class="form-group"><label for="perdaMotivo">Motivo</label><select id="perdaMotivo"><option>Vencimento</option><option>Avaria</option><option>Inutilização</option><option>Outro</option></select></div>
+      <button class="btn btn-primary" type="submit">Registrar perda</button>
+    </form>
+    <div class="mini-grid" style="margin-top:1rem"><div class="mini-stat"><span>Perdas registradas (unidades, não somadas entre unidades distintas)</span><strong id="lossCount">0</strong></div><div class="mini-stat"><span>Valor estimado das perdas</span><strong id="lossValue">R$ 0,00</strong></div></div>
+  </section>
+</main>
+<footer>SIGA-ARMP SUS 2.0 • Protótipo acadêmico • Não substitui sistemas oficiais de assistência farmacêutica nem validação por profissional responsável.</footer>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+"use strict";
+const STORAGE_KEY="siga_armp_sus_v2_state";
+const UBS=["UBS Centro","UBS Bairro Norte","UBS Vila Nova"];
+const DAY=86400000;
+const isoAfter=d=>{const x=new Date();x.setHours(12,0,0,0);x.setDate(x.getDate()+d);return x.toISOString().slice(0,10)};
+const SEED={
+ products:[
+  {id:"P1",name:"Losartana Potássica 50mg",unit:"comp.",cmm:900,lead:7,es:20,cost:.08,ven:"V"},
+  {id:"P2",name:"Seringa Descartável 5ml",unit:"un.",cmm:600,lead:7,es:20,cost:.35,ven:"E"},
+  {id:"P3",name:"Metformina 850mg",unit:"comp.",cmm:750,lead:10,es:20,cost:.12,ven:"V"},
+  {id:"P4",name:"Gaze Estéril Pct",unit:"pct",cmm:100,lead:7,es:20,cost:2.4,ven:"E"}
+ ],
+ configs:[
+  {ubs:UBS[0],productId:"P1",cmm:900,lead:7,es:20},{ubs:UBS[0],productId:"P2",cmm:600,lead:7,es:20},
+  {ubs:UBS[1],productId:"P1",cmm:400,lead:7,es:20},{ubs:UBS[1],productId:"P3",cmm:750,lead:10,es:20},
+  {ubs:UBS[2],productId:"P3",cmm:500,lead:10,es:20},{ubs:UBS[2],productId:"P4",cmm:100,lead:7,es:20}
+ ],
+ lots:[
+  {id:"L1",ubs:UBS[0],productId:"P1",code:"L2026A",qty:120,expiry:isoAfter(180)},
+  {id:"L2",ubs:UBS[0],productId:"P2",code:"S9981",qty:1500,expiry:isoAfter(300)},
+  {id:"L3",ubs:UBS[1],productId:"P1",code:"L2025X",qty:1800,expiry:isoAfter(35)},
+  {id:"L4",ubs:UBS[1],productId:"P3",code:"M4410",qty:80,expiry:isoAfter(210)},
+  {id:"L5",ubs:UBS[2],productId:"P3",code:"M4490",qty:1400,expiry:isoAfter(240)},
+  {id:"L6",ubs:UBS[2],productId:"P4",code:"G112",qty:300,expiry:isoAfter(400)}
+ ],
+ logs:["Sistema inicializado com cenário demonstrativo SIGA-ARMP SUS 2.0."],losses:[]
+};
+let state;
+const $=id=>document.getElementById(id);
+const clone=o=>JSON.parse(JSON.stringify(o));
+const fmt=n=>Number(n||0).toLocaleString("pt-BR");
+const money=n=>Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function load(){try{const raw=localStorage.getItem(STORAGE_KEY);state=raw?JSON.parse(raw):clone(SEED);if(!state.products||!state.configs||!state.lots)state=clone(SEED)}catch(e){state=clone(SEED)}persist()}
+function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){toast("Não foi possível salvar no navegador. Verifique o armazenamento disponível.")}}
+function product(id){return state.products.find(p=>p.id===id)}
+function config(ubs,pid){return state.configs.find(c=>c.ubs===ubs&&c.productId===pid)}
+function pp(c){return Math.ceil((Number(c.cmm)/30*Number(c.lead))+(Number(c.cmm)*Number(c.es)/100))}
+function stock(ubs,pid){return state.lots.filter(l=>l.ubs===ubs&&l.productId===pid&&l.qty>0&&l.expiry>=today()).reduce((s,l)=>s+l.qty,0)}
+function today(){const d=new Date();d.setHours(0,0,0,0);return d.toISOString().slice(0,10)}
+function daysTo(date){return Math.ceil((new Date(date+"T00:00:00")-new Date(today()+"T00:00:00"))/DAY)}
+function isValid(l){return l.expiry>=today()}
+function log(msg){state.logs.unshift(`[${new Date().toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"})}] ${msg}`);state.logs=state.logs.slice(0,100)}
+function toast(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove("show"),3800)}
+function setupSelects(){
+ const options=UBS.map(u=>`<option value="${esc(u)}">${esc(u)}</option>`).join("");
+ ["saidaUbs","entradaUbs","transfOrigem","transfDestino"].forEach(id=>$(id).innerHTML=options);
+ $("ubsFilter").innerHTML='<option value="TODAS">Todas as UBS (Rede Municipal)</option>'+options;
+ $("transfOrigem").value=UBS[1];$("transfDestino").value=UBS[0];
+}
+function abcClasses(){
+ const rows=state.products.map(p=>({id:p.id,value:state.configs.reduce((s,c)=>s+c.productId===p.id?0:0,0)}));
+ const vals=state.products.map(p=>({id:p.id,value:state.configs.filter(c=>c.productId===p.id).reduce((s,c)=>s+c.cmm*(p.cost||0),0)})).sort((a,b)=>b.value-a.value);
+ const total=vals.reduce((s,x)=>s+x.value,0);let cum=0;const result={};
+ vals.forEach(x=>{cum+=x.value;const pct=total?cum/total:1;result[x.id]=pct<=.8?"A":pct<=.95?"B":"C"});
+ return result;
+}
+function aggregateRows(){
+ const abc=abcClasses();
+ return state.configs.map(c=>{const p=product(c.productId);return {...c,p,stock:stock(c.ubs,c.productId),pp:pp(c),abc:abc[c.productId]||"C"}});
+}
+function suggestions(){
+ const rows=aggregateRows(),need=rows.filter(r=>r.stock<=r.pp);
+ const donorRemaining=new Map();
+ rows.forEach(r=>donorRemaining.set(r.ubs+"|"+r.productId,Math.max(0,r.stock-r.pp)));
+ const result=[];
+ for(const dest of need){
+  let deficit=Math.max(0,dest.pp-dest.stock);
+  if(deficit<=0)continue;
+  const donors=rows.filter(d=>d.productId===dest.productId&&d.ubs!==dest.ubs&&(donorRemaining.get(d.ubs+"|"+d.productId)||0)>0)
+   .sort((a,b)=>{const la=state.lots.filter(l=>l.ubs===a.ubs&&l.productId===a.productId&&l.qty>0&&isValid(l)).sort((x,y)=>x.expiry.localeCompare(y.expiry))[0];const lb=state.lots.filter(l=>l.ubs===b.ubs&&l.productId===b.productId&&l.qty>0&&isValid(l)).sort((x,y)=>x.expiry.localeCompare(y.expiry))[0];return (la?daysTo(la.expiry):99999)-(lb?daysTo(lb.expiry):99999)});
+  for(const donor of donors){
+   const key=donor.ubs+"|"+donor.productId,available=donorRemaining.get(key)||0;
+   if(available<=0||deficit<=0)continue;
+   const qty=Math.min(deficit,available);
+   const lot=state.lots.filter(l=>l.ubs===donor.ubs&&l.productId===donor.productId&&l.qty>0&&isValid(l)).sort((a,b)=>a.expiry.localeCompare(b.expiry))[0];
+   if(!lot)continue;
+   result.push({id:donor.ubs+"_"+dest.ubs+"_"+dest.productId,product:dest.p.name,unit:dest.p.unit,origin:donor.ubs,destination:dest.ubs,lotId:lot.id,lot:lot.code,qty,expiry:lot.expiry,reason:daysTo(lot.expiry)<=60?"Prioriza lote com validade próxima":"Saldo do doador acima do seu ponto de pedido"});
+   donorRemaining.set(key,available-qty);deficit-=qty;
+  }
+ }
+ return result;
+}
+function statusLot(l,r){const d=daysTo(l.expiry);if(d<0)return ["Vencido","badge-red"];if(d<=30)return ["Vence em "+d+" dias","badge-red"];if(d<=60)return ["Vence em "+d+" dias","badge-yellow"];if(r.stock<=r.pp)return ["Estoque ≤ PP","badge-red"];if(d<=90)return ["Atenção: "+d+" dias","badge-yellow"];return ["Regular","badge-green"]}
+function render(){
+ const filter=$("ubsFilter").value,term=$("searchInput").value.trim().toLowerCase();
+ const all=aggregateRows(),rows=all.filter(r=>filter==="TODAS"||r.ubs===filter);
+ const lots=state.lots.filter(l=>(filter==="TODAS"||l.ubs===filter)&&[l.code,product(l.productId)?.name,l.ubs].some(x=>String(x||"").toLowerCase().includes(term))).sort((a,b)=>a.expiry.localeCompare(b.expiry));
+ const sugg=suggestions().filter(s=>filter==="TODAS"||s.origin===filter||s.destination===filter);
+ $("kpiTotalItems").textContent=fmt(state.lots.filter(l=>(filter==="TODAS"||l.ubs===filter)&&l.qty>0).length);
+ $("kpiTotalLotes").textContent="Lotes cadastrados com saldo positivo";
+ $("kpiCritical").textContent=rows.filter(r=>r.stock<=r.pp).length;
+ $("kpiExpiring").textContent=state.lots.filter(l=>(filter==="TODAS"||l.ubs===filter)&&l.qty>0&&isValid(l)&&daysTo(l.expiry)<=60).length;
+ $("kpiTransfers").textContent=sugg.length;
+ $("transferSuggestionsList").innerHTML=sugg.length?sugg.map(s=>`<article class="suggestion-card"><div><span class="suggestion-badge">Oportunidade de remanejamento</span><p>Transferir <strong>${fmt(s.qty)} ${esc(s.unit)}</strong> de <strong>${esc(s.product)}</strong> (lote <code>${esc(s.lot)}</code>)<br>De: <strong>${esc(s.origin)}</strong> → Para: <strong>${esc(s.destination)}</strong></p><small class="hint">${esc(s.reason)} • Validade: ${dateBR(s.expiry)}</small></div><button class="btn btn-purple btn-sm" onclick="approveSuggestion('${encodeURIComponent(s.lotId)}','${encodeURIComponent(s.destination)}',${s.qty})">⇄ Aprovar e transferir</button></article>`).join(""):'<p class="empty-state">✓ Nenhuma oportunidade de remanejamento identificada para o filtro atual.</p>';
+ $("inventoryBody").innerHTML=lots.length?lots.map(l=>{const p=product(l.productId),r=all.find(x=>x.ubs===l.ubs&&x.productId===l.productId),st=statusLot(l,r);return `<tr><td><strong>${esc(l.ubs)}</strong></td><td>${esc(p.name)}</td><td><code>${esc(l.code)}</code></td><td class="${daysTo(l.expiry)<=60?'danger-text':''}">${dateBR(l.expiry)}<br><small class="hint">${daysTo(l.expiry)<0?"vencido":daysTo(l.expiry)+" dias"}</small></td><td><strong>${fmt(l.qty)}</strong> ${esc(p.unit)}</td><td>${fmt(r.stock)} / <strong>${fmt(r.pp)}</strong></td><td><span class="abc-tag abc-${r.abc}">${r.abc}</span> <span class="ven">${p.ven}</span></td><td><span class="badge ${st[1]}">${st[0]}</span></td></tr>`}).join(""):'<tr><td colspan="8" style="text-align:center;color:#64748b">Nenhum lote encontrado para os filtros aplicados.</td></tr>';
+ $("planningSummary").innerHTML=rows.map(r=>{const cover=r.cmm>0?r.stock/(r.cmm/30):Infinity;return `<div class="mini-stat"><span>${esc(r.ubs)} • ${esc(r.p.name)}</span><strong>${Number.isFinite(cover)?cover.toFixed(1).replace(".",",")+" dias":"Sem consumo informado"}</strong><span>Cobertura estimada • saldo ${fmt(r.stock)} ${esc(r.p.unit)} • PP ${fmt(r.pp)}</span></div>`}).join("")||'<p class="empty-state">Sem parâmetros cadastrados.</p>';
+ renderFormOptions();renderLogs();renderLosses();
+}
+function dateBR(iso){return new Date(iso+"T12:00:00").toLocaleDateString("pt-BR")}
+function renderFormOptions(){
+ const ubs=$("saidaUbs").value,sel=$("saidaItem"),items=state.products.filter(p=>stock(ubs,p.id)>0);
+ sel.innerHTML=items.length?items.map(p=>`<option value="${p.id}">${esc(p.name)} (disp.: ${fmt(stock(ubs,p.id))} ${esc(p.unit)})</option>`).join(""):'<option value="">Sem estoque válido</option>';
+ const orig=$("transfOrigem").value,ls=state.lots.filter(l=>l.ubs===orig&&l.qty>0&&isValid(l)).sort((a,b)=>a.expiry.localeCompare(b.expiry));
+ $("transfItem").innerHTML=ls.length?ls.map(l=>`<option value="${l.id}">${esc(product(l.productId).name)} | ${esc(l.code)} (${fmt(l.qty)} • ${dateBR(l.expiry)})</option>`).join(""):'<option value="">Sem lotes válidos</option>';
+ $("listaMedicamentos").innerHTML=state.products.map(p=>`<option value="${esc(p.name)}">`).join("");
+ const loss=$("perdaLote");loss.innerHTML=state.lots.filter(l=>l.qty>0).map(l=>`<option value="${l.id}">${esc(l.ubs)} • ${esc(product(l.productId).name)} • ${esc(l.code)} (${fmt(l.qty)})</option>`).join("");
+}
+function renderLogs(){$("auditLog").innerHTML=state.logs.slice(0,8).map(x=>`<li>${esc(x)}</li>`).join("")}
+function renderLosses(){const qty=state.losses.reduce((s,x)=>s+x.qty,0),value=state.losses.reduce((s,x)=>s+x.value,0);$("lossCount").textContent=fmt(qty);$("lossValue").textContent=money(value)}
+function ensureConfig(ubs,p){let c=config(ubs,p.id);if(!c){c={ubs,productId:p.id,cmm:600,lead:7,es:20};state.configs.push(c)}return c}
+function transfer(lotId,dest,qty,fromSuggestion=false){
+ const l=state.lots.find(x=>x.id===lotId);if(!l)return toast("Lote de origem não encontrado.");
+ if(l.ubs===dest)return toast("A UBS de destino deve ser diferente da origem.");
+ if(!isValid(l))return toast("Lote vencido: transferência bloqueada.");
+ const p=product(l.productId),sourceCfg=config(l.ubs,l.productId),destCfg=ensureConfig(dest,p);
+ const donorBalance=stock(l.ubs,l.productId),minimum=pp(sourceCfg);
+ const safeQty=Math.max(0,donorBalance-minimum);
+ if(!Number.isInteger(qty)||qty<=0||qty>l.qty||qty>safeQty)return toast(`Transferência bloqueada. O doador deve manter o PP (${fmt(minimum)} ${p.unit}); excedente seguro disponível: ${fmt(safeQty)}.`);
+ l.qty-=qty;
+ let target=state.lots.find(x=>x.ubs===dest&&x.productId===l.productId&&x.code.toLowerCase()===l.code.toLowerCase()&&x.expiry===l.expiry);
+ if(target)target.qty+=qty;else state.lots.push({id:"LOT"+Date.now()+Math.random().toString(16).slice(2,6),ubs:dest,productId:l.productId,code:l.code,qty,expiry:l.expiry});
+ log(`Remanejamento ${qty} ${p.unit} de ${p.name}: ${l.ubs} → ${dest} (lote ${l.code}).`);
+ persist();render();toast(`Transferência concluída: ${fmt(qty)} ${p.unit}.`);
+}
+window.approveSuggestion=(lotId,dest,qty)=>transfer(decodeURIComponent(lotId),decodeURIComponent(dest),qty,true);
+function bind(){
+ $("ubsFilter").addEventListener("change",render);$("searchInput").addEventListener("input",render);
+ ["saidaUbs","transfOrigem"].forEach(id=>$(id).addEventListener("change",renderFormOptions));
+ document.querySelectorAll(".tab-btn").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tab-btn").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".mov-form").forEach(x=>x.classList.remove("active"));b.classList.add("active");$("form"+b.dataset.tab[0].toUpperCase()+b.dataset.tab.slice(1)).classList.add("active")}));
+ $("formSaida").addEventListener("submit",e=>{e.preventDefault();const ubs=$("saidaUbs").value,pid=$("saidaItem").value,qty=Number($("saidaQtd").value);if(!pid||!Number.isInteger(qty)||qty<=0)return toast("Informe uma quantidade inteira válida.");const lots=state.lots.filter(l=>l.ubs===ubs&&l.productId===pid&&l.qty>0&&isValid(l)).sort((a,b)=>a.expiry.localeCompare(b.expiry));const available=lots.reduce((s,l)=>s+l.qty,0);if(qty>available)return toast(`Estoque válido insuficiente. Disponível: ${fmt(available)}.`);let remaining=qty,used=[];for(const l of lots){if(!remaining)break;const n=Math.min(l.qty,remaining);l.qty-=n;remaining-=n;used.push(`${l.code}: ${n}`)}log(`Dispensação FEFO na ${ubs}: ${qty} ${product(pid).unit} de ${product(pid).name}. Lotes: ${used.join(", ")}.`);persist();e.target.reset();render();toast("Dispensação registrada com FEFO: "+used.join("; "))});
+ $("formEntrada").addEventListener("submit",e=>{e.preventDefault();const ubs=$("entradaUbs").value,name=$("entradaNome").value.trim(),code=$("entradaLote").value.trim().toUpperCase(),expiry=$("entradaValidade").value,qty=Number($("entradaQtd").value),unit=$("entradaUnidade").value,cmm=Number($("entradaCmm").value),lead=Number($("entradaLead").value),es=Number($("entradaES").value),cost=Number($("entradaCusto").value),ven=$("entradaVen").value;if(!name||!code||!expiry||expiry<today()||!Number.isInteger(qty)||qty<=0||cmm<0||lead<0||es<0||es>300||cost<0)return toast("Revise os campos. A validade deve ser hoje ou futura e a quantidade deve ser inteira positiva.");let p=state.products.find(x=>x.name.toLowerCase()===name.toLowerCase()&&x.unit===unit);if(!p){p={id:"P"+Date.now(),name,unit,cmm,lead,es,cost,ven};state.products.push(p)}else{p.cost=cost||p.cost;p.ven=ven;p.unit=unit}const cfg=ensureConfig(ubs,p);cfg.cmm=cmm;cfg.lead=lead;cfg.es=es;let lot=state.lots.find(l=>l.ubs===ubs&&l.productId===p.id&&l.code.toLowerCase()===code.toLowerCase());if(lot){if(lot.expiry!==expiry)return toast("Este código de lote já existe com outra validade. Verifique o cadastro.");lot.qty+=qty}else state.lots.push({id:"LOT"+Date.now(),ubs,productId:p.id,code,qty,expiry});log(`Entrada na ${ubs}: +${qty} ${unit} de ${name}, lote ${code}, validade ${dateBR(expiry)}. PP calculado: ${pp(cfg)}.`);persist();e.target.reset();$("entradaCmm").value=600;$("entradaLead").value=7;$("entradaES").value=20;$("entradaCusto").value=0;render();toast(`Entrada registrada. Ponto de pedido calculado: ${fmt(pp(cfg))}.`)});
+ $("formTransferencia").addEventListener("submit",e=>{e.preventDefault();const id=$("transfItem").value,dest=$("transfDestino").value,qty=Number($("transfQtd").value),l=state.lots.find(x=>x.id===id);if(!l)return toast("Selecione um lote válido.");transfer(id,dest,qty);});
+ $("formPerda").addEventListener("submit",e=>{e.preventDefault();const id=$("perdaLote").value,qty=Number($("perdaQtd").value),reason=$("perdaMotivo").value,l=state.lots.find(x=>x.id===id);if(!l||!Number.isInteger(qty)||qty<=0||qty>l.qty)return toast("Quantidade de perda inválida para o lote.");const p=product(l.productId);l.qty-=qty;state.losses.unshift({date:new Date().toISOString(),lotId:l.id,product:p.name,ubs:l.ubs,qty,reason,value:qty*(p.cost||0)});log(`Perda registrada: ${qty} ${p.unit} de ${p.name}, ${reason}, ${l.ubs}, lote ${l.code}.`);persist();e.target.reset();render();toast("Perda registrada e saldo atualizado.")});
+ $("btnReset").addEventListener("click",()=>{if(!confirm("Restaurar o cenário demonstrativo? Todas as alterações locais serão perdidas."))return;state=clone(SEED);persist();$("ubsFilter").value="TODAS";$("searchInput").value="";render();toast("Cenário inicial restaurado.")});
+}
+document.addEventListener("DOMContentLoaded",()=>{load();setupSelects();bind();render()});
+</script>
+</body></html>
