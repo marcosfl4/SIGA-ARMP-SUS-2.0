@@ -24,6 +24,15 @@
 </header>
 <main class="container">
   <section class="notice"> <strong>Ambiente demonstrativo acadêmico:</strong> dados fictícios armazenados neste navegador. A integração em tempo real entre UBS exige servidor e banco de dados centralizados.</section>
+  <section class="panel" id="aiPanel">
+    <h2>🤖 Previsão de CMM por IA (notebook)</h2>
+    <p class="hint">Importe o arquivo <code>previsoes_cmm.json</code> gerado no notebook. Com a opção ativada, ponto de pedido, cobertura e remanejamentos passam a usar o CMM previsto.</p>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:8px 0">
+      <input type="file" id="fcFile" accept=".json,application/json">
+      <label><input type="checkbox" id="useForecast"> Usar CMM previsto (IA)</label>
+    </div>
+    <div id="fcStatus" class="hint">Nenhuma previsão importada.</div>
+  </section>
   <section class="kpi-grid" aria-label="Indicadores principais">
     <div class="kpi-card"><div class="kpi-header"><span class="kpi-title">Lotes monitorados</span><span class="kpi-icon blue">📦</span></div><div class="kpi-value" id="kpiTotalItems">0</div><div class="kpi-sub" id="kpiTotalLotes">0 ativos</div></div>
     <div class="kpi-card border-red"><div class="kpi-header"><span class="kpi-title">Itens no ponto de pedido</span><span class="kpi-icon red">🚨</span></div><div class="kpi-value text-red" id="kpiCritical">0</div><div class="kpi-sub">Estoque total por UBS ≤ PP</div></div>
@@ -114,7 +123,7 @@ const SEED={
   {id:"L5",ubs:UBS[2],productId:"P3",code:"M4490",qty:1400,expiry:isoAfter(240)},
   {id:"L6",ubs:UBS[2],productId:"P4",code:"G112",qty:300,expiry:isoAfter(400)}
  ],
- logs:["Sistema inicializado com cenário demonstrativo SIGA-ARMP SUS 2.0."],losses:[]
+ forecast:{},useForecast:false,logs:["Sistema inicializado com cenário demonstrativo SIGA-ARMP SUS 2.0."],losses:[]
 };
 let state;
 const $=id=>document.getElementById(id);
@@ -122,11 +131,31 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const fmt=n=>Number(n||0).toLocaleString("pt-BR");
 const money=n=>Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function load(){try{const raw=localStorage.getItem(STORAGE_KEY);state=raw?JSON.parse(raw):clone(SEED);if(!state.products||!state.configs||!state.lots)state=clone(SEED)}catch(e){state=clone(SEED)}persist()}
+function load(){try{const raw=localStorage.getItem(STORAGE_KEY);state=raw?JSON.parse(raw):clone(SEED);if(!state.products||!state.configs||!state.lots)state=clone(SEED)}catch(e){state=clone(SEED)}state.forecast=state.forecast||{};state.useForecast=!!state.useForecast;persist()}
 function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){toast("Não foi possível salvar no navegador. Verifique o armazenamento disponível.")}}
 function product(id){return state.products.find(p=>p.id===id)}
 function config(ubs,pid){return state.configs.find(c=>c.ubs===ubs&&c.productId===pid)}
-function pp(c){return Math.ceil((Number(c.cmm)/30*Number(c.lead))+(Number(c.cmm)*Number(c.es)/100))}
+function fcKey(ubs,pid){const p=product(pid);return p?ubs+"|"+p.name:""}
+function isFc(c){return !!(state.useForecast&&state.forecast[fcKey(c.ubs,c.productId)])}
+function cmmEf(c){return isFc(c)?Number(state.forecast[fcKey(c.ubs,c.productId)].cmm_previsto):Number(c.cmm)}
+function ppm(c,m){return Math.ceil((m/30*Number(c.lead))+(m*Number(c.es)/100))}
+function pp(c){return ppm(c,cmmEf(c))}
+function atRisk(ubs,pid,cmm){const d=cmm/30;let cum=0,risk=0;state.lots.filter(l=>l.ubs===ubs&&l.productId===pid&&l.qty>0&&isValid(l)).sort((a,b)=>a.expiry.localeCompare(b.expiry)).forEach(l=>{const cap=Math.max(0,d*daysTo(l.expiry)-cum);risk+=Math.max(0,l.qty-cap);cum+=l.qty});return Math.round(risk)}
+function importForecast(text){
+ let arr;try{arr=JSON.parse(text)}catch(e){return toast("Arquivo inválido: use o previsoes_cmm.json gerado pelo notebook.")}
+ if(!Array.isArray(arr))return toast("Formato inesperado: o arquivo deve conter uma lista de previsões.");
+ let ok=0;state.forecast={};
+ arr.forEach(r=>{const p=state.products.find(x=>x.name===r.medicamento),v=Number(r.cmm_previsto);if(p&&UBS.includes(r.ubs)&&Number.isFinite(v)&&v>=0){state.forecast[r.ubs+"|"+p.name]={cmm_previsto:v,cmm_tradicional:Number(r.cmm_tradicional),erro_mae:Number(r.erro_mae),mes:String(r.mes||"")};ok++}});
+ state.useForecast=ok>0;$("useForecast").checked=state.useForecast;
+ log(`Previsão de CMM por IA importada: ${ok} de ${arr.length} registros reconhecidos.`);persist();render();
+ toast(ok?`Previsão importada (${ok} séries). PP recalculado com o CMM previsto.`:"Nenhum registro correspondeu às UBS e medicamentos do painel.");
+}
+function renderForecastStatus(){
+ const el=$("fcStatus"),keys=Object.keys(state.forecast||{});
+ if(!keys.length){el.textContent="Nenhuma previsão importada.";return}
+ const rows=state.configs.map(c=>{const f=state.forecast[fcKey(c.ubs,c.productId)];if(!f)return"";return `<tr><td>${esc(c.ubs)} • ${esc(product(c.productId).name)}</td><td>${fmt(c.cmm)}</td><td><strong>${fmt(f.cmm_previsto)}</strong></td><td>${fmt(ppm(c,Number(c.cmm)))}</td><td><strong>${fmt(ppm(c,f.cmm_previsto))}</strong></td><td>±${fmt(f.erro_mae)}</td></tr>`}).join("");
+ el.innerHTML=`Previsão para <strong>${esc(state.forecast[keys[0]].mes||"?")}</strong> • ${keys.length} séries • ${state.useForecast?"IA ativa":"IA desativada (usando CMM cadastrado)"}.`+(rows?`<div style="overflow-x:auto"><table><thead><tr><th>UBS • Item</th><th>CMM cadastrado</th><th>CMM previsto (IA)</th><th>PP atual</th><th>PP com IA</th><th>Erro típico (MAE)</th></tr></thead><tbody>${rows}</tbody></table></div>`:"");
+}
 function stock(ubs,pid){return state.lots.filter(l=>l.ubs===ubs&&l.productId===pid&&l.qty>0&&l.expiry>=today()).reduce((s,l)=>s+l.qty,0)}
 function today(){const d=new Date();d.setHours(0,0,0,0);return d.toISOString().slice(0,10)}
 function daysTo(date){return Math.ceil((new Date(date+"T00:00:00")-new Date(today()+"T00:00:00"))/DAY)}
@@ -140,8 +169,7 @@ function setupSelects(){
  $("transfOrigem").value=UBS[1];$("transfDestino").value=UBS[0];
 }
 function abcClasses(){
- const rows=state.products.map(p=>({id:p.id,value:state.configs.reduce((s,c)=>s+c.productId===p.id?0:0,0)}));
- const vals=state.products.map(p=>({id:p.id,value:state.configs.filter(c=>c.productId===p.id).reduce((s,c)=>s+c.cmm*(p.cost||0),0)})).sort((a,b)=>b.value-a.value);
+  const vals=state.products.map(p=>({id:p.id,value:state.configs.filter(c=>c.productId===p.id).reduce((s,c)=>s+c.cmm*(p.cost||0),0)})).sort((a,b)=>b.value-a.value);
  const total=vals.reduce((s,x)=>s+x.value,0);let cum=0;const result={};
  vals.forEach(x=>{cum+=x.value;const pct=total?cum/total:1;result[x.id]=pct<=.8?"A":pct<=.95?"B":"C"});
  return result;
@@ -163,9 +191,9 @@ function suggestions(){
   for(const donor of donors){
    const key=donor.ubs+"|"+donor.productId,available=donorRemaining.get(key)||0;
    if(available<=0||deficit<=0)continue;
-   const qty=Math.min(deficit,available);
    const lot=state.lots.filter(l=>l.ubs===donor.ubs&&l.productId===donor.productId&&l.qty>0&&isValid(l)).sort((a,b)=>a.expiry.localeCompare(b.expiry))[0];
    if(!lot)continue;
+   const qty=Math.min(deficit,available,lot.qty);
    result.push({id:donor.ubs+"_"+dest.ubs+"_"+dest.productId,product:dest.p.name,unit:dest.p.unit,origin:donor.ubs,destination:dest.ubs,lotId:lot.id,lot:lot.code,qty,expiry:lot.expiry,reason:daysTo(lot.expiry)<=60?"Prioriza lote com validade próxima":"Saldo do doador acima do seu ponto de pedido"});
    donorRemaining.set(key,available-qty);deficit-=qty;
   }
@@ -185,8 +213,8 @@ function render(){
  $("kpiTransfers").textContent=sugg.length;
  $("transferSuggestionsList").innerHTML=sugg.length?sugg.map(s=>`<article class="suggestion-card"><div><span class="suggestion-badge">Oportunidade de remanejamento</span><p>Transferir <strong>${fmt(s.qty)} ${esc(s.unit)}</strong> de <strong>${esc(s.product)}</strong> (lote <code>${esc(s.lot)}</code>)<br>De: <strong>${esc(s.origin)}</strong> → Para: <strong>${esc(s.destination)}</strong></p><small class="hint">${esc(s.reason)} • Validade: ${dateBR(s.expiry)}</small></div><button class="btn btn-purple btn-sm" onclick="approveSuggestion('${encodeURIComponent(s.lotId)}','${encodeURIComponent(s.destination)}',${s.qty})">⇄ Aprovar e transferir</button></article>`).join(""):'<p class="empty-state">✓ Nenhuma oportunidade de remanejamento identificada para o filtro atual.</p>';
  $("inventoryBody").innerHTML=lots.length?lots.map(l=>{const p=product(l.productId),r=all.find(x=>x.ubs===l.ubs&&x.productId===l.productId),st=statusLot(l,r);return `<tr><td><strong>${esc(l.ubs)}</strong></td><td>${esc(p.name)}</td><td><code>${esc(l.code)}</code></td><td class="${daysTo(l.expiry)<=60?'danger-text':''}">${dateBR(l.expiry)}<br><small class="hint">${daysTo(l.expiry)<0?"vencido":daysTo(l.expiry)+" dias"}</small></td><td><strong>${fmt(l.qty)}</strong> ${esc(p.unit)}</td><td>${fmt(r.stock)} / <strong>${fmt(r.pp)}</strong></td><td><span class="abc-tag abc-${r.abc}">${r.abc}</span> <span class="ven">${p.ven}</span></td><td><span class="badge ${st[1]}">${st[0]}</span></td></tr>`}).join(""):'<tr><td colspan="8" style="text-align:center;color:#64748b">Nenhum lote encontrado para os filtros aplicados.</td></tr>';
- $("planningSummary").innerHTML=rows.map(r=>{const cover=r.cmm>0?r.stock/(r.cmm/30):Infinity;return `<div class="mini-stat"><span>${esc(r.ubs)} • ${esc(r.p.name)}</span><strong>${Number.isFinite(cover)?cover.toFixed(1).replace(".",",")+" dias":"Sem consumo informado"}</strong><span>Cobertura estimada • saldo ${fmt(r.stock)} ${esc(r.p.unit)} • PP ${fmt(r.pp)}</span></div>`}).join("")||'<p class="empty-state">Sem parâmetros cadastrados.</p>';
- renderFormOptions();renderLogs();renderLosses();
+ $("planningSummary").innerHTML=rows.map(r=>{const m=cmmEf(r),cover=m>0?r.stock/(m/30):Infinity,risk=atRisk(r.ubs,r.productId,m);return `<div class="mini-stat"><span>${esc(r.ubs)} • ${esc(r.p.name)}</span><strong>${Number.isFinite(cover)?cover.toFixed(1).replace(".",",")+" dias":"Sem consumo informado"}</strong><span>Cobertura estimada • saldo ${fmt(r.stock)} ${esc(r.p.unit)} • PP ${fmt(r.pp)} • CMM ${fmt(m)}${isFc(r)?" (IA)":""}</span><span class="${risk>0?'danger-text':''}">Em risco de vencer até a validade: ${fmt(risk)} ${esc(r.p.unit)} (${money(risk*(r.p.cost||0))})</span></div>`}).join("")||'<p class="empty-state">Sem parâmetros cadastrados.</p>';
+ renderFormOptions();renderLogs();renderLosses();renderForecastStatus();
 }
 function dateBR(iso){return new Date(iso+"T12:00:00").toLocaleDateString("pt-BR")}
 function renderFormOptions(){
@@ -204,7 +232,7 @@ function transfer(lotId,dest,qty,fromSuggestion=false){
  const l=state.lots.find(x=>x.id===lotId);if(!l)return toast("Lote de origem não encontrado.");
  if(l.ubs===dest)return toast("A UBS de destino deve ser diferente da origem.");
  if(!isValid(l))return toast("Lote vencido: transferência bloqueada.");
- const p=product(l.productId),sourceCfg=config(l.ubs,l.productId),destCfg=ensureConfig(dest,p);
+ const p=product(l.productId),sourceCfg=config(l.ubs,l.productId);if(!config(dest,l.productId)){state.configs.push({ubs:dest,productId:l.productId,cmm:sourceCfg.cmm,lead:sourceCfg.lead,es:sourceCfg.es});log("Parâmetros de "+p.name+" copiados de "+l.ubs+" para "+dest+": revisar o CMM.")}
  const donorBalance=stock(l.ubs,l.productId),minimum=pp(sourceCfg);
  const safeQty=Math.max(0,donorBalance-minimum);
  if(!Number.isInteger(qty)||qty<=0||qty>l.qty||qty>safeQty)return toast(`Transferência bloqueada. O doador deve manter o PP (${fmt(minimum)} ${p.unit}); excedente seguro disponível: ${fmt(safeQty)}.`);
@@ -223,7 +251,10 @@ function bind(){
  $("formEntrada").addEventListener("submit",e=>{e.preventDefault();const ubs=$("entradaUbs").value,name=$("entradaNome").value.trim(),code=$("entradaLote").value.trim().toUpperCase(),expiry=$("entradaValidade").value,qty=Number($("entradaQtd").value),unit=$("entradaUnidade").value,cmm=Number($("entradaCmm").value),lead=Number($("entradaLead").value),es=Number($("entradaES").value),cost=Number($("entradaCusto").value),ven=$("entradaVen").value;if(!name||!code||!expiry||expiry<today()||!Number.isInteger(qty)||qty<=0||cmm<0||lead<0||es<0||es>300||cost<0)return toast("Revise os campos. A validade deve ser hoje ou futura e a quantidade deve ser inteira positiva.");let p=state.products.find(x=>x.name.toLowerCase()===name.toLowerCase()&&x.unit===unit);if(!p){p={id:"P"+Date.now(),name,unit,cmm,lead,es,cost,ven};state.products.push(p)}else{p.cost=cost||p.cost;p.ven=ven;p.unit=unit}const cfg=ensureConfig(ubs,p);cfg.cmm=cmm;cfg.lead=lead;cfg.es=es;let lot=state.lots.find(l=>l.ubs===ubs&&l.productId===p.id&&l.code.toLowerCase()===code.toLowerCase());if(lot){if(lot.expiry!==expiry)return toast("Este código de lote já existe com outra validade. Verifique o cadastro.");lot.qty+=qty}else state.lots.push({id:"LOT"+Date.now(),ubs,productId:p.id,code,qty,expiry});log(`Entrada na ${ubs}: +${qty} ${unit} de ${name}, lote ${code}, validade ${dateBR(expiry)}. PP calculado: ${pp(cfg)}.`);persist();e.target.reset();$("entradaCmm").value=600;$("entradaLead").value=7;$("entradaES").value=20;$("entradaCusto").value=0;render();toast(`Entrada registrada. Ponto de pedido calculado: ${fmt(pp(cfg))}.`)});
  $("formTransferencia").addEventListener("submit",e=>{e.preventDefault();const id=$("transfItem").value,dest=$("transfDestino").value,qty=Number($("transfQtd").value),l=state.lots.find(x=>x.id===id);if(!l)return toast("Selecione um lote válido.");transfer(id,dest,qty);});
  $("formPerda").addEventListener("submit",e=>{e.preventDefault();const id=$("perdaLote").value,qty=Number($("perdaQtd").value),reason=$("perdaMotivo").value,l=state.lots.find(x=>x.id===id);if(!l||!Number.isInteger(qty)||qty<=0||qty>l.qty)return toast("Quantidade de perda inválida para o lote.");const p=product(l.productId);l.qty-=qty;state.losses.unshift({date:new Date().toISOString(),lotId:l.id,product:p.name,ubs:l.ubs,qty,reason,value:qty*(p.cost||0)});log(`Perda registrada: ${qty} ${p.unit} de ${p.name}, ${reason}, ${l.ubs}, lote ${l.code}.`);persist();e.target.reset();render();toast("Perda registrada e saldo atualizado.")});
- $("btnReset").addEventListener("click",()=>{if(!confirm("Restaurar o cenário demonstrativo? Todas as alterações locais serão perdidas."))return;state=clone(SEED);persist();$("ubsFilter").value="TODAS";$("searchInput").value="";render();toast("Cenário inicial restaurado.")});
+ $("useForecast").checked=state.useForecast;
+ $("useForecast").addEventListener("change",e=>{state.useForecast=e.target.checked;persist();render()});
+ $("fcFile").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>importForecast(String(rd.result));rd.readAsText(f);e.target.value=""});
+ $("btnReset").addEventListener("click",()=>{if(!confirm("Restaurar o cenário demonstrativo? Todas as alterações locais serão perdidas."))return;state=clone(SEED);persist();$("useForecast").checked=false;$("ubsFilter").value="TODAS";$("searchInput").value="";render();toast("Cenário inicial restaurado.")});
 }
 document.addEventListener("DOMContentLoaded",()=>{load();setupSelects();bind();render()});
 </script>
